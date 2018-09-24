@@ -1,0 +1,35 @@
+{% extends 'layout.njk' %}
+{% from "components/button/macro.njk" import govukButton %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block content %}
+
+    {% if formErrors %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: formErrors
+        }) }}
+    {% endif %}
+
+    <form name="questionnaire-form" id="questionnaire-form" action="{{ formAction }}" method="post">
+
+        <div class="govuk-width-container">
+            {% if previousPageId %}
+                <a href="/{{questionnaireId}}/{{questionnaireName}}/{{previousPageId}}" class="govuk-back-link">Back</a>
+            {% endif %}
+            <main class="govuk-main-wrapper">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        {{ formHtml | safe }}
+                        {{ govukButton({
+                            text: "Continue"
+                        }) }}
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/6.5.2/ajv.min.js" ></script>
+{% endblock %}

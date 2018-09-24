@@ -1,0 +1,53 @@
+# WebStorm config
+.idea
+
+#Visual Studio Code local configuration
+.vscode
+
+#Generated fixtures
+src/test/fixtures/*
+
+# Coverage directory used by tools like istanbul
+src/coverage
+coverage
+
+# nyc test coverage
+.nyc_output
+
+#env config file
+.env*
+
+*.crt
+
+# document uploads
+src/uploads/
+
+test.bat
+src/test/documents
+
+uploads/
+src/clamscan
+pdf/
+
+install.bat
+.dottemp
+
+/node_modules
+
+.tmp
+
+*~
+*#
+.DS_STORE
+.netbeans
+nbproject
+.idea
+.node_history
+dump.rdb
+
+npm-debug.log
+lib-cov
+*.seed
+*.log
+*.out
+*.pid
