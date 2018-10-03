@@ -14,9 +14,7 @@
     <form name="questionnaire-form" id="questionnaire-form" action="{{ formAction }}" method="post">
 
         <div class="govuk-width-container">
-            {% if previousPageId %}
-                <a href="/{{questionnaireId}}/{{questionnaireName}}/{{previousPageId}}" class="govuk-back-link">Back</a>
-            {% endif %}
+            <a href="/{{questionnaireId}}/{{questionnaireName}}/previous" class="govuk-back-link">Back</a>
             <main class="govuk-main-wrapper">
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-two-thirds">

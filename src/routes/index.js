@@ -3,6 +3,10 @@ const express = require('express');
 const router = express.Router();
 const jsonSchemaToX = require('json-schema-to-x');
 const questionnaireService = require('questionnaire-service')();
+const qRouter = require('q-router');
+
+let currentQuestionnaireId; // crude cache to get the router example to work.
+let qrouter;
 
 // const questionnaireService = require('../services/questionnaireService');
 // const logger = require('morgan');
@@ -19,6 +23,30 @@ router.get('/check-your-answers/:questionnaireId/:questionnaireName', (req, res)
     });
 });
 
+router.get('/:questionnaireId/:questionnaireName/previous', (req, res) => {
+    const { questionnaireId } = req.params;
+    const { questionnaireName } = req.params;
+
+    return questionnaireService.getQuestionnaireById(questionnaireId).then(questionnaireData => {
+        if (!currentQuestionnaireId) {
+            currentQuestionnaireId = questionnaireId;
+            qrouter = qRouter(questionnaireData);
+        }
+        qrouter.previous();
+        const previousSectionId = qrouter.getCurrentState().value;
+        let previousSectionIdFormatted = previousSectionId.replace('p--', '');
+        previousSectionIdFormatted = previousSectionIdFormatted.replace('p-', '');
+
+        return res.redirect(
+            `/${questionnaireId}/${questionnaireName}/${previousSectionIdFormatted}`
+        );
+    });
+});
+
+// router.get('/:questionnaireId/:questionnaireName/next', (req, res) => {
+
+// });
+
 router.get('/:questionnaireId/:questionnaireName?/:sectionId?', (req, res) => {
     const url = req.originalUrl;
     const { questionnaireId } = req.params;
@@ -31,20 +59,20 @@ router.get('/:questionnaireId/:questionnaireName?/:sectionId?', (req, res) => {
             return res.redirect(`/check-your-answers/${questionnaireId}/${questionnaireName}`);
         }
 
-        // get all sections
-        // check if -blah, then check if --blah exists.
-
-        // questionnaire section IDs can be in 2 formats:
-        // 'q-applicant-name', and 'q--crime-reference'.
-        // the first is namespaced to the person it pertains to (i.e 'applicant').
-        // the second is not namespaced and is a generic schema, and is
-        // person-unspecific.
-        // take 'sectionId' and make sure it corrisponds to a section we have defined.
         return (
             questionnaireService
                 // get all the section IDs defined within this questionnaire.
                 .getQuestionnaireSectionsIdsByQuestionnaireId(questionnaireId)
                 .then(sectionIds => {
+                    // get all sections
+                    // check if -blah, then check if --blah exists.
+
+                    // questionnaire section IDs can be in 2 formats:
+                    // 'q-applicant-name', and 'q--crime-reference'.
+                    // the first is namespaced to the person it pertains to (i.e 'applicant').
+                    // the second is not namespaced and is a generic schema, and is
+                    // person-unspecific.
+                    // take 'sectionId' and make sure it corrisponds to a section we have defined.
                     let absoluteSectionId;
                     // does it conform to the namespaced format?
                     if (sectionIds.includes(`p-${sectionId}`)) {
@@ -56,7 +84,6 @@ router.get('/:questionnaireId/:questionnaireName?/:sectionId?', (req, res) => {
                     return absoluteSectionId;
                 })
                 .then(absoluteSectionId => {
-                    console.log('ABSOLUTE QUESTIONNAIRE SECTION ID:', absoluteSectionId);
                     const promises = [
                         questionnaireService.getQuestionnaireSectionById(
                             questionnaireId,
@@ -77,6 +104,7 @@ router.get('/:questionnaireId/:questionnaireName?/:sectionId?', (req, res) => {
                                 questionnaireId,
                                 questionnaireName,
                                 absoluteSectionId,
+                                sectionId,
                                 formAction: `${url}`,
                                 formHtml: jsonSchemaToX.toForm(schema, uiSchema)
                             });
@@ -164,25 +192,28 @@ router.post('/:questionnaireId/:questionnaireName?/:sectionId?', (req, res) => {
 
                         // if valid, go to next section.
                         if (validationResult.valid) {
-                            // return questionnaireService
-                            //     .getNextQuestionnaireSectionIdById(
-                            //         questionnaireId,
-                            //         absoluteSectionId
-                            //     )
-                            //     .then(response => {
-                            //         const nextSectionInfo = response;
-                            //         return res.redirect(
-                            //             `/${questionnaireId}/${questionnaireName}/${
-                            //                 nextSectionInfo.sectionId
-                            //             }`
-                            //         );
-                            //     })
-                            //     .catch(
-                            //         err => res.status(404).render('404', err)
-                            //         // throw err;
-                            //         // logger.log('error', err);
-                            //     );
-                            return res.render('yay');
+                            return questionnaireService
+                                .getQuestionnaireById(questionnaireId)
+                                .then(questionnaireData => {
+                                    if (!currentQuestionnaireId) {
+                                        currentQuestionnaireId = questionnaireId;
+                                        qrouter = qRouter(questionnaireData);
+                                    }
+                                    return qrouter;
+                                })
+                                .then(qr => {
+                                    qr.next('ANSWER', reqBody);
+                                    const nextSectionId = qr.getCurrentState().value;
+                                    let nextSectionIdFormatted = nextSectionId.replace('p--', '');
+                                    nextSectionIdFormatted = nextSectionIdFormatted.replace(
+                                        'p-',
+                                        ''
+                                    );
+
+                                    return res.redirect(
+                                        `/${questionnaireId}/${questionnaireName}/${nextSectionIdFormatted}`
+                                    );
+                                });
                         }
 
                         // process the errors if there are some.
