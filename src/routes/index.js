@@ -5,10 +5,8 @@ const jsonSchemaToX = require('json-schema-to-x');
 const questionnaireService = require('questionnaire-service')();
 const qRouter = require('q-router');
 
-let currentQuestionnaireId; // crude cache to get the router example to work.
-let qrouter;
+let qrouter; // TEMP: db cache. TODO: implement database.
 
-// const questionnaireService = require('../services/questionnaireService');
 // const logger = require('morgan');
 
 router.get('/', (req, res) => res.status(200).render('error'));
@@ -27,291 +25,144 @@ router.get('/:questionnaireId/:questionnaireName/previous', (req, res) => {
     const { questionnaireId } = req.params;
     const { questionnaireName } = req.params;
 
-    return questionnaireService.getQuestionnaireById(questionnaireId).then(questionnaireData => {
-        if (!currentQuestionnaireId) {
-            currentQuestionnaireId = questionnaireId;
+    qrouter.previous();
+    const previousSectionId = qrouter.getCurrentState().value;
+    const previousSectionIdFormatted = previousSectionId.replace('p--', '').replace('p-', '');
+
+    return res.redirect(`/${questionnaireId}/${questionnaireName}/${previousSectionIdFormatted}`);
+});
+
+router.get('/:questionnaireId/:questionnaireName', (req, res) => {
+    const { questionnaireId } = req.params;
+    const { questionnaireName } = req.params;
+
+    async function redirectRequest(qId) {
+        if (!qrouter) {
+            const questionnaireData = await questionnaireService.getQuestionnaireById(qId);
             qrouter = qRouter(questionnaireData);
         }
-        qrouter.previous();
-        const previousSectionId = qrouter.getCurrentState().value;
-        let previousSectionIdFormatted = previousSectionId.replace('p--', '');
-        previousSectionIdFormatted = previousSectionIdFormatted.replace('p-', '');
-
-        return res.redirect(
-            `/${questionnaireId}/${questionnaireName}/${previousSectionIdFormatted}`
-        );
-    });
-});
-
-// router.get('/:questionnaireId/:questionnaireName/next', (req, res) => {
-
-// });
-
-router.get('/:questionnaireId/:questionnaireName?/:sectionId?', (req, res) => {
-    const url = req.originalUrl;
-    const { questionnaireId } = req.params;
-    const { questionnaireName } = req.params;
-    const { sectionId } = req.params;
-
-    // if a specific section of a specific questionnaire is being requested...
-    if (questionnaireId && questionnaireName && sectionId) {
-        if (sectionId === 'none') {
-            return res.redirect(`/check-your-answers/${questionnaireId}/${questionnaireName}`);
-        }
-
-        return (
-            questionnaireService
-                // get all the section IDs defined within this questionnaire.
-                .getQuestionnaireSectionsIdsByQuestionnaireId(questionnaireId)
-                .then(sectionIds => {
-                    // get all sections
-                    // check if -blah, then check if --blah exists.
-
-                    // questionnaire section IDs can be in 2 formats:
-                    // 'q-applicant-name', and 'q--crime-reference'.
-                    // the first is namespaced to the person it pertains to (i.e 'applicant').
-                    // the second is not namespaced and is a generic schema, and is
-                    // person-unspecific.
-                    // take 'sectionId' and make sure it corrisponds to a section we have defined.
-                    let absoluteSectionId;
-                    // does it conform to the namespaced format?
-                    if (sectionIds.includes(`p-${sectionId}`)) {
-                        absoluteSectionId = `p-${sectionId}`;
-                        // does it conform to the non-namespaced format?
-                    } else if (sectionIds.includes(`p--${sectionId}`)) {
-                        absoluteSectionId = `p--${sectionId}`;
-                    }
-                    return absoluteSectionId;
-                })
-                .then(absoluteSectionId => {
-                    const promises = [
-                        questionnaireService.getQuestionnaireSectionById(
-                            questionnaireId,
-                            absoluteSectionId
-                        ),
-                        questionnaireService.getUISchemaById(absoluteSectionId) // ,
-                        // questionnaireService.getPreviousQuestionnaireSectionIdById(questionnaireId, absoluteSectionId)
-                    ];
-
-                    return Promise.all(promises)
-                        .then(results => {
-                            const schema = results[0];
-                            const uiSchema = results[1];
-                            // const previousSectionInfo = results[2];
-
-                            return res.render('questionnaire', {
-                                // previousSectionId: previousSectionInfo.absoluteSectionId,
-                                questionnaireId,
-                                questionnaireName,
-                                absoluteSectionId,
-                                sectionId,
-                                formAction: `${url}`,
-                                formHtml: jsonSchemaToX.toForm(schema, uiSchema)
-                            });
-                        })
-                        .catch(err => {
-                            console.log('HEllo: ', err);
-                            res.status(404).render('404', err);
-                            // throw err;
-                            // logger.log('error', err);
-                        });
-                })
-        );
-
-        // if a specific questionnaire is being requested, serve
-        // the first section of that questionnaire.
-    } else if (questionnaireId && questionnaireName && !sectionId) {
-        return (
-            questionnaireService
-                .getQuestionnaireSectionsByQuestionnaireId(questionnaireId)
-                // .catch(err => {
-                //     return res.status(404).render('error', {error: err});
-                // })
-                .then(sections => {
-                    // extract the schema file name from the JSON.
-                    const schemaFilePath = sections[0].match(/^.*\/(.*)\.\w+$/)[1];
-                    return schemaFilePath;
-                })
-                .then(questionnaireSectionId =>
-                    res.redirect(
-                        `/${questionnaireId}/${questionnaireName}/${questionnaireSectionId}`
-                    )
-                )
-                .catch(
-                    err => res.status(404).render('404', err)
-                    // throw err;
-                    // logger.log('error', err);
-                )
-        );
+        let sectionId = qrouter.getCurrentState().value;
+        sectionId = sectionId.replace('p--', '').replace('p-', '');
+        return res.redirect(`/${questionnaireId}/${questionnaireName}/${sectionId}`);
     }
 
-    return res.status(404).render('error');
+    return redirectRequest(questionnaireId);
 });
 
-router.post('/:questionnaireId/:questionnaireName?/:sectionId?', (req, res) => {
-    const url = req.originalUrl;
-    const reqBody = req.body;
+router.get('/:questionnaireId/:questionnaireName/:sectionId*?', (req, res) => {
     const { questionnaireId } = req.params;
     const { questionnaireName } = req.params;
     const { sectionId } = req.params;
+    let savedAnswers;
 
-    return (
-        questionnaireService
-            // get all the section IDs defined within this questionnaire.
-            .getQuestionnaireSectionsIdsByQuestionnaireId(questionnaireId)
-            .then(sectionIds => {
-                let absoluteSectionId;
-                // does it conform to the namespaced format?
-                if (sectionIds.includes(`p-${sectionId}`)) {
-                    absoluteSectionId = `p-${sectionId}`;
-                    // does it conform to the non-namespaced format?
-                } else if (sectionIds.includes(`p--${sectionId}`)) {
-                    absoluteSectionId = `p--${sectionId}`;
-                }
-                return absoluteSectionId;
-            })
-            .then(absoluteSectionId => {
-                const promises = [
-                    questionnaireService.getQuestionnaireSectionById(
-                        questionnaireId,
-                        absoluteSectionId
-                    ),
-                    questionnaireService.postQuestionnaireSectionById(
-                        questionnaireId,
-                        absoluteSectionId,
-                        reqBody
-                    ),
-                    questionnaireService.getUISchemaById(absoluteSectionId)
-                ];
-                return Promise.all(promises)
-                    .then(result => {
-                        const schema = result[0];
-                        const validationResult = result[1];
-                        const uiSchema = result[2];
-                        let errorSummaryData;
+    async function renderPage(qId) {
+        if (!qrouter) {
+            const questionnaireData = await questionnaireService.getQuestionnaireById(qId);
+            qrouter = qRouter(questionnaireData);
+        }
+        savedAnswers = qrouter.extendedState.answers;
+        const questionnaireSectionIds = await questionnaireService.getQuestionnaireSectionsIdsByQuestionnaireId(
+            qId
+        );
 
-                        // if valid, go to next section.
-                        if (validationResult.valid) {
-                            return questionnaireService
-                                .getQuestionnaireById(questionnaireId)
-                                .then(questionnaireData => {
-                                    if (!currentQuestionnaireId) {
-                                        currentQuestionnaireId = questionnaireId;
-                                        qrouter = qRouter(questionnaireData);
-                                    }
-                                    return qrouter;
-                                })
-                                .then(qr => {
-                                    qr.next('ANSWER', reqBody);
-                                    const nextSectionId = qr.getCurrentState().value;
-                                    let nextSectionIdFormatted = nextSectionId.replace('p--', '');
-                                    nextSectionIdFormatted = nextSectionIdFormatted.replace(
-                                        'p-',
-                                        ''
-                                    );
+        // get all sections
+        // check if --blah, then check if -blah exists.
 
-                                    return res.redirect(
-                                        `/${questionnaireId}/${questionnaireName}/${nextSectionIdFormatted}`
-                                    );
-                                });
-                        }
+        // questionnaire section IDs can be in 2 formats:
+        // 'q--crime-reference', and 'q-applicant-name'.
+        // the first is not namespaced and is a generic schema, and is
+        // person-unspecific. the second is namespaced to the person it
+        // pertains to (i.e 'applicant'). take 'sectionId' and make sure
+        // it corrisponds to a section we have defined.
+        let absoluteSectionId;
+        // does it conform to the non-namespaced format?
+        if (questionnaireSectionIds.includes(`p--${sectionId}`)) {
+            absoluteSectionId = `p--${sectionId}`;
+            // does it conform to the namespaced format?
+        } else if (questionnaireSectionIds.includes(`p-${sectionId}`)) {
+            absoluteSectionId = `p-${sectionId}`;
+        }
 
-                        // process the errors if there are some.
-                        if (!validationResult.valid) {
-                            // we need to create a shape of error date that will work for the nunjucks template.
-                            errorSummaryData = Object.entries(validationResult).map(
-                                ([href, text]) => ({
-                                    href: `#${href}`,
-                                    text
-                                })
-                            );
-                        }
+        const questionnaireSectionData = await questionnaireService.getQuestionnaireSectionById(
+            questionnaireId,
+            absoluteSectionId
+        );
+        const questionSectionUISchema = await questionnaireService.getUISchemaById(
+            absoluteSectionId
+        );
 
-                        return res.render('questionnaire', {
-                            questionnaireId,
-                            questionnaireName,
-                            sectionId,
-                            formAction: `${url}`,
-                            formHtml: jsonSchemaToX.toForm(
-                                schema,
-                                uiSchema,
-                                reqBody,
-                                validationResult
-                            ),
-                            formErrors: errorSummaryData
-                        });
-                    })
-                    .catch(err => {
-                        throw err;
-                        // logger.log('error', err);
-                    });
-            })
-    );
+        return res.render('questionnaire', {
+            questionnaireId,
+            questionnaireName,
+            absoluteSectionId,
+            sectionId,
+            formAction: `/${questionnaireId}/${questionnaireName}/${sectionId}`,
+            formHtml: jsonSchemaToX.toForm(
+                questionnaireSectionData,
+                questionSectionUISchema,
+                absoluteSectionId,
+                savedAnswers
+            )
+        });
+    }
+    return renderPage(questionnaireId);
 });
 
-// router.post('/:questionnaireId/:questionnaireName?/nextsection/:sectionId?', (req, res) => {
-//     const url = req.originalUrl;
-//     const { questionnaireId } = req.params;
-//     const { questionnaireName } = req.params;
-//     const { sectionId } = req.params;
+router.post('/:questionnaireId/:questionnaireName/:sectionId', (req, res) => {
+    const { questionnaireId } = req.params;
+    const { questionnaireName } = req.params;
+    const { sectionId } = req.params;
+    const reqBody = req.body;
+    const currentSectionId = qrouter.getCurrentState().value || sectionId;
+    const savedAnswers = qrouter.extendedState.answers;
 
-//     if (questionnaireId && questionnaireName && sectionId) {
-//         return questionnaireService.getNextQuestionnaireSectionIdById(questionnaireId, sectionId)
-//             .then(nextSectionId => {
-//                 return nextSectionId;
-//             })
-//             .catch(
-//                 err => {
-//                     return res.status(404).render('404');
-//                 // throw err;
-//                 // logger.log('error', err);
-//             });
-//     }
+    async function validateFormResponse() {
+        const validationResponse = await questionnaireService.postQuestionnaireSectionById(
+            questionnaireId,
+            currentSectionId,
+            reqBody
+        );
 
-//     return res.status(404).render('error');
-// });
+        const questionnaireSectionData = await questionnaireService.getQuestionnaireSectionById(
+            questionnaireId,
+            currentSectionId
+        );
+        const questionSectionUISchema = await questionnaireService.getUISchemaById(
+            currentSectionId
+        );
 
-// router.get('/:url(*)', function(req, res, next) {
-//     const url = req.params.url;
-//     let deconstructedUrl = questionnaireService.deconstructUrl(url);
-//     if(!deconstructedUrl) {
-//         return next();
-//     }
-//     return questionnaireService.getQuestionnaireSectionById(deconstructedUrl.questionnaireId, deconstructedUrl.sectionId)
-//         .then(schema => {
-//             return res.render('questionnaire', {
-//                 formAction: `/${url}`,
-//                 formHtml: jsonSchemaToX.toForm(schema)
-//             });
-//         })
-//         .catch(err => {
-//             console.log(err);
-//         });
-// });
+        if (validationResponse.valid) {
+            qrouter.next('ANSWER', reqBody);
+            let nextSectionId = qrouter.getCurrentState().value;
+            nextSectionId = nextSectionId.replace('p--', '').replace('p-', '');
+            return res.redirect(`/${questionnaireId}/${questionnaireName}/${nextSectionId}`);
+        }
 
-// router.post('/:url(*)', function(req, res, next) {
-//     const url = req.params.url;
-//     const reqBody = req.body;
-//     let deconstructedUrl = questionnaireService.deconstructUrl(url);
-//     if(!deconstructedUrl) {
-//         return next();
-//     }
-//     let promises = [
-//         schema = questionnaireService.getQuestionnaireSectionById(deconstructedUrl.questionnaireId, deconstructedUrl.sectionId),
-//         response = questionnaireService.postQuestionnaireSectionById(deconstructedUrl.questionnaireId, deconstructedUrl.sectionId, reqBody)
-//     ]
-//     return Promise.all(promises)
-//         .then(result => {
-//             console.log(result);
-//             return res.render('questionnaire', {
-//                 formAction: `/${url}`,
-//                 formHtml: jsonSchemaToX.toForm(result[0], reqBody),
-//                 formErrors: result[1].validationResult.valid ? '' : result[1].validationResult
-//             });
-//         })
-//         .catch(err => {
-//             console.log(err);
-//         });
-// });
+        // process the errors if there are some.
+        // we need to create a shape of error date that will work for the nunjucks template.
+        const errorSummaryData = Object.entries(validationResponse).map(([href, text]) => ({
+            href: `#${href}`,
+            text
+        }));
+
+        return res.render('questionnaire', {
+            questionnaireId,
+            questionnaireName,
+            currentSectionId,
+            formAction: `/${questionnaireId}/${questionnaireName}/${currentSectionId}`,
+            formHtml: jsonSchemaToX.toForm(
+                questionnaireSectionData,
+                questionSectionUISchema,
+                currentSectionId,
+                savedAnswers,
+                reqBody,
+                validationResponse
+            ),
+            formErrors: errorSummaryData
+        });
+    }
+
+    return validateFormResponse();
+});
 
 module.exports = router;
