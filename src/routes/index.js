@@ -25,8 +25,7 @@ router.get('/:questionnaireId/:questionnaireName/previous', (req, res) => {
     const { questionnaireId } = req.params;
     const { questionnaireName } = req.params;
 
-    qrouter.previous();
-    const previousSectionId = qrouter.getCurrentState().value;
+    const previousSectionId = qrouter.previous();
     const previousSectionIdFormatted = previousSectionId.replace('p--', '').replace('p-', '');
 
     return res.redirect(`/${questionnaireId}/${questionnaireName}/${previousSectionIdFormatted}`);
@@ -41,7 +40,7 @@ router.get('/:questionnaireId/:questionnaireName', (req, res) => {
             const questionnaireData = await questionnaireService.getQuestionnaireById(qId);
             qrouter = qRouter(questionnaireData);
         }
-        let sectionId = qrouter.getCurrentState().value;
+        let sectionId = qrouter.current();
         sectionId = sectionId.replace('p--', '').replace('p-', '');
         return res.redirect(`/${questionnaireId}/${questionnaireName}/${sectionId}`);
     }
@@ -49,18 +48,25 @@ router.get('/:questionnaireId/:questionnaireName', (req, res) => {
     return redirectRequest(questionnaireId);
 });
 
-router.get('/:questionnaireId/:questionnaireName/:sectionId*?', (req, res) => {
+router.get('/:questionnaireId/:questionnaireName/:sectionId/:pageNumber?/*?', (req, res) => {
     const { questionnaireId } = req.params;
     const { questionnaireName } = req.params;
     const { sectionId } = req.params;
+    const { pageNumber } = req.params;
     let savedAnswers;
+
+    // console.log('=======================');
+    // console.log(qrouter.history);
+    // console.log('=======================');
+    // console.log(qrouter.questionnaire.answers);
+    // console.log('=======================');
 
     async function renderPage(qId) {
         if (!qrouter) {
             const questionnaireData = await questionnaireService.getQuestionnaireById(qId);
             qrouter = qRouter(questionnaireData);
         }
-        savedAnswers = qrouter.extendedState.answers;
+        savedAnswers = qrouter.questionnaire.answers;
         const questionnaireSectionIds = await questionnaireService.getQuestionnaireSectionsIdsByQuestionnaireId(
             qId
         );
@@ -91,51 +97,75 @@ router.get('/:questionnaireId/:questionnaireName/:sectionId*?', (req, res) => {
             absoluteSectionId
         );
 
+        let formAction = `/${questionnaireId}/${questionnaireName}/${sectionId}/`;
+        if (pageNumber) {
+            formAction = `${formAction}${pageNumber}`;
+        }
+        console.log('====================================');
+        console.log(qrouter.questionnaire.answers);
+
         return res.render('questionnaire', {
             questionnaireId,
             questionnaireName,
             absoluteSectionId,
             sectionId,
-            formAction: `/${questionnaireId}/${questionnaireName}/${sectionId}`,
-            formHtml: jsonSchemaToX.toForm(
-                questionnaireSectionData,
-                questionSectionUISchema,
-                absoluteSectionId,
+            formAction,
+            formHtml: jsonSchemaToX.toForm({
+                formData: questionnaireSectionData,
+                uiSchema: questionSectionUISchema,
+                sectionId: absoluteSectionId,
                 savedAnswers
-            )
+            })
         });
     }
     return renderPage(questionnaireId);
 });
 
-router.post('/:questionnaireId/:questionnaireName/:sectionId', (req, res) => {
+router.post('/:questionnaireId/:questionnaireName/:sectionId/:pageNumber?', (req, res) => {
     const { questionnaireId } = req.params;
     const { questionnaireName } = req.params;
     const { sectionId } = req.params;
+    const { pageNumber } = req.params;
     const reqBody = req.body;
-    const currentSectionId = qrouter.getCurrentState().value || sectionId;
-    const savedAnswers = qrouter.extendedState.answers;
+    const savedAnswers = qrouter.questionnaire.answers;
 
     async function validateFormResponse() {
-        const validationResponse = await questionnaireService.postQuestionnaireSectionById(
-            questionnaireId,
-            currentSectionId,
-            reqBody
+        let absoluteSectionId;
+
+        const questionnaireSectionIds = await questionnaireService.getQuestionnaireSectionsIdsByQuestionnaireId(
+            questionnaireId
         );
+
+        if (questionnaireSectionIds.includes(`p--${sectionId}`)) {
+            absoluteSectionId = `p--${sectionId}`;
+        } else if (questionnaireSectionIds.includes(`p-${sectionId}`)) {
+            absoluteSectionId = `p-${sectionId}`;
+        }
 
         const questionnaireSectionData = await questionnaireService.getQuestionnaireSectionById(
             questionnaireId,
-            currentSectionId
+            absoluteSectionId
         );
         const questionSectionUISchema = await questionnaireService.getUISchemaById(
-            currentSectionId
+            absoluteSectionId
+        );
+        const validationResponse = await questionnaireService.postQuestionnaireSectionById(
+            questionnaireId,
+            absoluteSectionId,
+            reqBody
         );
 
+        if (pageNumber) {
+            console.log({ pageNumber });
+            absoluteSectionId = `${absoluteSectionId}/${pageNumber}`;
+        }
+
         if (validationResponse.valid) {
-            qrouter.next('ANSWER', reqBody);
-            let nextSectionId = qrouter.getCurrentState().value;
+            let nextSectionId = qrouter.next('ANSWER', reqBody, absoluteSectionId);
+            console.log({ reqBody, absoluteSectionId, nextSectionId });
             nextSectionId = nextSectionId.replace('p--', '').replace('p-', '');
-            return res.redirect(`/${questionnaireId}/${questionnaireName}/${nextSectionId}`);
+            console.log({ nextSectionId });
+            return res.redirect(`/${questionnaireId}/${questionnaireName}/${nextSectionId}/`);
         }
 
         // process the errors if there are some.
@@ -148,16 +178,15 @@ router.post('/:questionnaireId/:questionnaireName/:sectionId', (req, res) => {
         return res.render('questionnaire', {
             questionnaireId,
             questionnaireName,
-            currentSectionId,
-            formAction: `/${questionnaireId}/${questionnaireName}/${currentSectionId}`,
-            formHtml: jsonSchemaToX.toForm(
-                questionnaireSectionData,
-                questionSectionUISchema,
-                currentSectionId,
+            sectionId,
+            formAction: `/${questionnaireId}/${questionnaireName}/${sectionId}/`,
+            formHtml: jsonSchemaToX.toForm({
+                formData: questionnaireSectionData,
+                uiSchema: questionSectionUISchema,
+                sectionId: absoluteSectionId,
                 savedAnswers,
-                reqBody,
-                validationResponse
-            ),
+                formErrors: validationResponse
+            }),
             formErrors: errorSummaryData
         });
     }
