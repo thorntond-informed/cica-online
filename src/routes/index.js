@@ -48,18 +48,12 @@ router.get('/:questionnaireId/:questionnaireName', (req, res) => {
     return redirectRequest(questionnaireId);
 });
 
-router.get('/:questionnaireId/:questionnaireName/:sectionId/:pageNumber?/*?', (req, res) => {
+router.get('/:questionnaireId/:questionnaireName/:sectionId/:pageNumber?', (req, res) => {
     const { questionnaireId } = req.params;
     const { questionnaireName } = req.params;
     const { sectionId } = req.params;
     const { pageNumber } = req.params;
     let savedAnswers;
-
-    // console.log('=======================');
-    // console.log(qrouter.history);
-    // console.log('=======================');
-    // console.log(qrouter.questionnaire.answers);
-    // console.log('=======================');
 
     async function renderPage(qId) {
         if (!qrouter) {
@@ -156,16 +150,13 @@ router.post('/:questionnaireId/:questionnaireName/:sectionId/:pageNumber?', (req
         );
 
         if (pageNumber) {
-            console.log({ pageNumber });
             absoluteSectionId = `${absoluteSectionId}/${pageNumber}`;
         }
 
         if (validationResponse.valid) {
             let nextSectionId = qrouter.next('ANSWER', reqBody, absoluteSectionId);
-            console.log({ reqBody, absoluteSectionId, nextSectionId });
             nextSectionId = nextSectionId.replace('p--', '').replace('p-', '');
-            console.log({ nextSectionId });
-            return res.redirect(`/${questionnaireId}/${questionnaireName}/${nextSectionId}/`);
+            return res.redirect(`/${questionnaireId}/${questionnaireName}/${nextSectionId}`);
         }
 
         // process the errors if there are some.
@@ -179,7 +170,7 @@ router.post('/:questionnaireId/:questionnaireName/:sectionId/:pageNumber?', (req
             questionnaireId,
             questionnaireName,
             sectionId,
-            formAction: `/${questionnaireId}/${questionnaireName}/${sectionId}/`,
+            formAction: `/${questionnaireId}/${questionnaireName}/${sectionId}`,
             formHtml: jsonSchemaToX.toForm({
                 formData: questionnaireSectionData,
                 uiSchema: questionSectionUISchema,
