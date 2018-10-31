@@ -69,7 +69,7 @@
         }
     },
     "scripts": {
-        "start": "npm run sass && npm run sass-ie8 && npm explore json-schema-to-x -- npm run copy && node app.js",
+        "start": "node app.js",
         "test": "jest",
         "sass": "node-sass src/assets/css/styles.scss public/assets/css/styles.css",
         "sass-ie8": "node-sass src/assets/css/styles-ie8.scss public/assets/css/styles-ie8.css"
