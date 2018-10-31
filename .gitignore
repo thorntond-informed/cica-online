@@ -51,3 +51,5 @@ lib-cov
 *.log
 *.out
 *.pid
+
+/stuff*

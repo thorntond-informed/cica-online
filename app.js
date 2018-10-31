@@ -34,6 +34,11 @@ app.use('/', routes);
 /* * EXPOSE                                   * */
 /* ******************************************** */
 
-app.listen(3000, () => {
-    console.log(`Base module app listening on port 3000`);
+const port = 3000;
+app.listen(port, () => {
+    // https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
+    // https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+    console.log(
+        `\x1b[32m--- CICA Online module app listening on \x1b[4m${port}\x1b[24m ---\x1b[0m`
+    );
 });
