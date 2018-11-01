@@ -17,3 +17,5 @@ COPY / /usr/src/app
 
 EXPOSE 3000
 CMD [ "npm", "start" ]
+# docker build -t cicav2-cica-online .
+# docker run -d -p 3000:3000 --restart=always --name cicav2--cica-online cicav2-cica-online
