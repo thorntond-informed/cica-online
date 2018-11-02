@@ -29,7 +29,7 @@ uploads/
 src/clamscan
 pdf/
 
-install.bat
+#install.bat
 .dottemp
 
 /node_modules
