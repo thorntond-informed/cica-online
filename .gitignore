@@ -33,6 +33,7 @@ install.bat
 .dottemp
 
 /node_modules
+/src/node_modules
 
 .tmp
 
