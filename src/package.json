@@ -8,6 +8,7 @@
         "body-parser": "^1.13.3",
         "compression": "^1.5.2",
         "cookie-parser": "^1.4.3",
+        "dotenv": "^6.1.0",
         "express": "^4.16.3",
         "govuk-frontend": "^2.2.0",
         "json-schema-to-x": "https://bitbucket.org/adrianroworth/json-schema-to-x.git#docker-test",
@@ -16,7 +17,7 @@
         "node-sass": "^4.9.4",
         "nunjucks": "^3.1.3",
         "q-router": "https://bitbucket.org/adrianroworth/q-router.git#docker-test",
-        "questionnaire-service": "https://bitbucket.org/adrianroworth/questionnaire.git#docker-test"
+        "questionnaire-service": "git+https://bitbucket.org/adrianroworth/questionnaire.git#docker-test"
     },
     "devDependencies": {
         "eslint": "^4.19.1",
@@ -30,7 +31,8 @@
         "jest": "^23.4.1",
         "lint-staged": "^7.2.0",
         "nsp": "^3.2.1",
-        "prettier": "^1.11.1"
+        "prettier": "^1.11.1",
+        "supertest": "^3.3.0"
     },
     "lint-staged": {
         "*.js": [

@@ -1,7 +1,6 @@
 const express = require('express');
 const config = require('./app/config/config');
 const path = require('path');
-const nunjucks = require('nunjucks');
 const routes = require('./app/routes/index');
 
 let app = express();
@@ -12,11 +11,6 @@ app = require('./app/config/express')(app, config);
 /* ******************************************** */
 
 app.use('/', express.static(path.resolve(__dirname, './public')));
-
-nunjucks.configure(path.resolve(__dirname, './app/views'), {
-    autoescape: true,
-    express: app
-});
 
 app.use('/', routes);
 
@@ -35,6 +29,7 @@ app.use('/', routes);
 /* ******************************************** */
 
 const port = 3000;
+
 app.listen(port, () => {
     // https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
     // https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
