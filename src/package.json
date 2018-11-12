@@ -15,6 +15,7 @@
         "method-override": "^2.3.0",
         "morgan": "^1.9.0",
         "node-sass": "^4.9.4",
+        "fast-html-parser": "^1.0.1",
         "nunjucks": "^3.1.3",
         "q-router": "https://bitbucket.org/adrianroworth/q-router.git#docker-test",
         "questionnaire-service": "git+https://bitbucket.org/adrianroworth/questionnaire.git#docker-test"
