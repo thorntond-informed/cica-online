@@ -2691,3 +2691,64 @@ p + .govuk-heading-s,
 .govuk-\!-width-one-quarter {
   width: 100% !important;
   width: 25% !important; }
+
+.app-check-your-answers {
+  font-family: "nta", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.25;
+  font-size: 19px;
+  font-size: 1.1875rem;
+  line-height: 1.31579;
+  margin-top: 0;
+  margin-bottom: 40px;
+  margin-bottom: 60px;
+  display: table; }
+
+.app-check-your-answers--short {
+  width: 100%; }
+  .app-check-your-answers--short .app-check-your-answers__question {
+    width: 30%; }
+
+.app-check-your-answers--long {
+  width: 100%; }
+  .app-check-your-answers--long .app-check-your-answers__question {
+    width: 50%; }
+
+.app-check-your-answers__contents {
+  position: relative;
+  border-bottom: 1px solid #bfc1c3;
+  display: table-row;
+  border-bottom-width: 0; }
+
+.app-check-your-answers__contents:first-child .app-check-your-answers__question,
+.app-check-your-answers__contents:first-child .app-check-your-answers__answer,
+.app-check-your-answers__contents:first-child .app-check-your-answers__change {
+  padding-top: 0; }
+
+.app-check-your-answers__question,
+.app-check-your-answers__answer,
+.app-check-your-answers__change {
+  display: block;
+  margin: 0;
+  display: table-cell;
+  border-bottom: 1px solid #bfc1c3;
+  padding: 0.63158em 1.05263em 0.47368em 0; }
+
+.app-check-your-answers__question {
+  font-weight: bold;
+  margin: 0.63158em 4em 0.21053em 0; }
+
+.app-check-your-answers__answer {
+  padding-bottom: 0.47368em; }
+
+.app-check-your-answers__change {
+  text-align: right;
+  position: absolute;
+  top: 0;
+  right: 0;
+  position: static;
+  padding-right: 0; }
