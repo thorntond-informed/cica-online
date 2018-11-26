@@ -19,6 +19,8 @@ coverage
 
 *.crt
 
+*.bat
+
 # document uploads
 src/uploads/
 
@@ -29,10 +31,11 @@ uploads/
 src/clamscan
 pdf/
 
-install.bat
+#install.bat
 .dottemp
 
 /node_modules
+/src/node_modules
 
 .tmp
 
