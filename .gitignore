@@ -19,6 +19,8 @@ coverage
 
 *.crt
 
+*.bat
+
 # document uploads
 src/uploads/
 
