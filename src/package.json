@@ -10,15 +10,16 @@
         "cookie-parser": "^1.4.3",
         "dotenv": "^6.1.0",
         "express": "^4.16.3",
+        "fast-html-parser": "^1.0.1",
         "govuk-frontend": "^2.2.0",
-        "json-schema-to-x": "https://bitbucket.org/adrianroworth/json-schema-to-x.git#docker-test",
+        "json-schema-to-x": "file:../../json-schema-to-x",
         "method-override": "^2.3.0",
         "morgan": "^1.9.0",
         "node-sass": "^4.9.4",
-        "fast-html-parser": "^1.0.1",
         "nunjucks": "^3.1.3",
+        "page-renderer": "file:../../page-renderer",
         "q-router": "https://bitbucket.org/adrianroworth/q-router.git#docker-test",
-        "questionnaire-service": "git+https://bitbucket.org/adrianroworth/questionnaire.git#docker-test"
+        "questionnaire-service": "file:../../questionnaire"
     },
     "devDependencies": {
         "eslint": "^4.19.1",
@@ -72,13 +73,13 @@
         }
     },
     "scripts": {
-        "start": "node app.js",
+        "start": "node lib/index.js",
         "test": "jest",
-        "sass": "node-sass app/assets/css/styles.scss public/assets/css/styles.css",
-        "sass-ie8": "node-sass app/assets/css/styles-ie8.scss public/assets/css/styles-ie8.css",
+        "sass": "node-sass lib/assets/css/styles.scss public/assets/css/styles.css",
+        "sass-ie8": "node-sass lib/assets/css/styles-ie8.scss public/assets/css/styles-ie8.css",
         "sass-all": "npm run sass && npm run sass-ie8"
     },
-    "main": "app.js",
+    "main": "lib/index.js",
     "repository": {
         "type": "git",
         "url": "git://github.com/anonymous node/sails user/cica-online.git"
