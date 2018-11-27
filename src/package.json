@@ -12,14 +12,14 @@
         "express": "^4.16.3",
         "fast-html-parser": "^1.0.1",
         "govuk-frontend": "^2.2.0",
-        "json-schema-to-x": "file:../../json-schema-to-x",
+        "json-schema-to-x": "https://github.com/CriminalInjuriesCompensationAuthority/q-json-schema-parser.git",
         "method-override": "^2.3.0",
         "morgan": "^1.9.0",
         "node-sass": "^4.9.4",
         "nunjucks": "^3.1.3",
-        "page-renderer": "file:../../page-renderer",
-        "q-router": "https://bitbucket.org/adrianroworth/q-router.git#docker-test",
-        "questionnaire-service": "file:../../questionnaire"
+        "page-renderer": "https://github.com/CriminalInjuriesCompensationAuthority/page-renderer.git",
+        "q-router": "https://github.com/CriminalInjuriesCompensationAuthority/q-router.git",
+        "questionnaire-service": "https://github.com/CriminalInjuriesCompensationAuthority/questionnaire-service.git"
     },
     "devDependencies": {
         "eslint": "^4.19.1",
