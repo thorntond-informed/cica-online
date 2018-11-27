@@ -12,7 +12,7 @@
         "express": "^4.16.3",
         "fast-html-parser": "^1.0.1",
         "govuk-frontend": "^2.2.0",
-        "json-schema-to-x": "https://github.com/CriminalInjuriesCompensationAuthority/q-json-schema-parser.git",
+        "q-json-schema-parser": "https://github.com/CriminalInjuriesCompensationAuthority/q-json-schema-parser.git",
         "method-override": "^2.3.0",
         "morgan": "^1.9.0",
         "node-sass": "^4.9.4",

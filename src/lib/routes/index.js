@@ -4,7 +4,7 @@ const router = express.Router();
 const questionnaireService = require('questionnaire-service')();
 const qRouter = require('q-router');
 const Page = require('page-renderer');
-const schemaParserResolve = require('json-schema-to-x')().resolve;
+const schemaParserResolve = require('q-json-schema-parser')().resolve;
 
 let qrouter; // TEMP: db cache. TODO: implement database.
 
