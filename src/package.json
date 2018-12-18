@@ -12,12 +12,12 @@
         "express": "^4.16.3",
         "fast-html-parser": "^1.0.1",
         "govuk-frontend": "^2.2.0",
-        "q-json-schema-parser": "https://github.com/CriminalInjuriesCompensationAuthority/q-json-schema-parser.git",
         "method-override": "^2.3.0",
         "morgan": "^1.9.0",
         "node-sass": "^4.9.4",
         "nunjucks": "^3.1.3",
         "page-renderer": "https://github.com/CriminalInjuriesCompensationAuthority/page-renderer.git",
+        "q-json-schema-parser": "https://github.com/CriminalInjuriesCompensationAuthority/q-json-schema-parser.git",
         "q-router": "https://github.com/CriminalInjuriesCompensationAuthority/q-router.git",
         "questionnaire-service": "https://github.com/CriminalInjuriesCompensationAuthority/questionnaire-service.git"
     },
@@ -74,6 +74,7 @@
     },
     "scripts": {
         "start": "node lib/index.js",
+        "debug": "node --inspect=5858 lib/index.js",
         "test": "jest",
         "sass": "node-sass lib/assets/css/styles.scss public/assets/css/styles.css",
         "sass-ie8": "node-sass lib/assets/css/styles-ie8.scss public/assets/css/styles-ie8.css",
