@@ -10,7 +10,11 @@ let qrouter; // TEMP: db cache. TODO: implement database.
 
 // const logger = require('morgan');
 
-router.get('/', (req, res) => res.render('index', { dateTime: new Date() }));
+router.get('/', (req, res) => {
+    const page = Page();
+    const pageHtml = page.getStatic('index');
+    return res.send(pageHtml);
+});
 
 router.get('/:questionnaireId/:questionnaireName/previous', (req, res) => {
     const { questionnaireId } = req.params;
@@ -157,6 +161,10 @@ router.post('/:questionnaireId/:questionnaireName/:sectionId/:pageNumber?', asyn
     return res.send(pageHtml);
 });
 
-router.get('*', (req, res) => res.render('404'));
+router.get('*', (req, res) => {
+    const page = Page();
+    const pageHtml = page.getStatic('404');
+    return res.send(pageHtml);
+});
 
 module.exports = router;
