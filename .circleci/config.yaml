@@ -8,10 +8,7 @@ jobs:
     steps:
       - checkout
 
-      - run: bash aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh \
-                  chmod 777 dockerlogin.sh \
-                  ./dockerlogin.sh \
-                  rm dockerlogin.sh 
+      - run: bash aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh && chmod 777 dockerlogin.sh && ./dockerlogin.sh && rm dockerlogin.sh 
 
       #- run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
