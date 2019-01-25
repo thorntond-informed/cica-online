@@ -1,1 +1,92 @@
 
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8.11.3
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - run: 
+          name: install dependencies 
+          command: |
+             cp src/package.json /tmp/package.json
+             cd /tmp && npm install
+      # Download and cache dependencies
+      #- restore_cache:
+      #    keys:
+      #    - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+      #    - v1-dependencies-
+
+      - run: 
+           name: Build docker image
+           command: |
+               cd ../
+               npm install
+               cd ../
+               docker build --no-cache -t cicav2-cica-online . 
+               
+      #- save_cache:
+      #    paths:
+      #      - node_modules
+      #    key: v1-dependencies-{{ checksum "package.json" }}
+        
+      # run tests!
+      - run: yarn test
+
+
+
+
+
+
+#version: 2
+#jobs:
+#  build:
+#    docker:
+#      - image: circleci/node:8.15.0-stretch
+#    steps:
+#      - checkout
+#      - run: 
+#          name: install dependencies 
+#          command: |
+#             cp src/package.json /tmp/package.json
+#             cd /tmp && npm install
+#      - run:
+#          name: build
+#          command: npm start
+      #- run: 
+      #    name: Create placeholder directory for application resource
+      #    command: |
+      #       sudo mkdir -p /usr/src/app/
+          
+
+    
+      ##- run: 
+        ##name: Authenticate with docker
+        ##command: |
+          ##aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh
+          ##chmod 777 dockerlogin.sh 
+          ##./dockerlogin.sh 
+          ##rm dockerlogin.sh 
+
+      #- run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      #- run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
+
+      #- run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
+
+      #- store_artifacts:
+      #    path: Dockerfile
