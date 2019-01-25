@@ -1,0 +1,38 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.15.0-stretch
+    steps:
+      - checkout
+      - run: 
+          name: install dependencies 
+          command: |
+             cp src/package.json /tmp/package.json
+             cd /tmp && npm install
+      - run:
+          name: build
+          command: npm start
+      #- run: 
+      #    name: Create placeholder directory for application resource
+      #    command: |
+      #       sudo mkdir -p /usr/src/app/
+          
+
+    
+      ##- run: 
+        ##name: Authenticate with docker
+        ##command: |
+          ##aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh
+          ##chmod 777 dockerlogin.sh 
+          ##./dockerlogin.sh 
+          ##rm dockerlogin.sh 
+
+      #- run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      #- run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
+
+      #- run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
+
+      #- store_artifacts:
+      #    path: Dockerfile
