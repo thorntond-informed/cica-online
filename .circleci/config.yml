@@ -21,7 +21,10 @@ jobs:
       - checkout
       - run: 
           name: install dependencies 
-          command: |
+          command: | 
+             sudo apt-get update -y && sudo apt-get install -y linux-image-extra-$(uname -r)
+             sudo apt-get install docker-engine -y  
+             sudo service docker start
              cp src/package.json /tmp/package.json
              cd /tmp && npm install
       # Download and cache dependencies
@@ -37,7 +40,7 @@ jobs:
                cd src/
                npm install
                cd ../
-               service docker restart
+      #         service docker restart
                docker build --no-cache -t cicav2-cica-online . 
                
       #- save_cache:
