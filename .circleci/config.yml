@@ -34,7 +34,7 @@ jobs:
       - run: 
            name: Build docker image
            command: |
-               cd ../
+               cd src/
                npm install
                cd ../
                docker build --no-cache -t cicav2-cica-online . 
