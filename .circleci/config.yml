@@ -40,7 +40,6 @@ jobs:
                cd src/
                npm install
                cd ../
-      #         service docker restart
                docker build --no-cache -t cicav2-cica-online . 
                
       #- save_cache:
