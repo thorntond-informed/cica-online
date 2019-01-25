@@ -37,6 +37,7 @@ jobs:
                cd src/
                npm install
                cd ../
+               service docker restart
                docker build --no-cache -t cicav2-cica-online . 
                
       #- save_cache:
@@ -45,7 +46,7 @@ jobs:
       #    key: v1-dependencies-{{ checksum "package.json" }}
         
       # run tests!
-      - run: yarn test
+      #- run: yarn test
 
 
 
