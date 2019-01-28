@@ -17,6 +17,7 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: install dependencies
           command: |
@@ -25,26 +26,7 @@ jobs:
              sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev
              curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py
              sudo pip install -q awscli --upgrade
-            
-            
-#            apt-get update && apt-get install -y awscli
-             
-             
-#             curl -O https://bootstrap.pypa.io/get-pip.py
-#             python get-pip.py --user
-#             export PATH=~/.local/bin:$PATH
-#             pip install awscli
 
-
-
-  package:
-    docker:
-      - image: circleci/node:8.11.3
-
-    working_directory: ~/my-repo
-    steps:
-      - checkout
-      - setup_remote_docker
       - run:
           name: Build docker image
           command: |
@@ -62,16 +44,8 @@ jobs:
           name: Push docker container to ECR repository
           command: |
               docker tag cicav2-cica-online:latest 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-demo
-              docker push 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-dem
+              docker push 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-demo
 
-workflows:
-  version: 2
-  build_and_package:
-       jobs:
-         - build
-         - package:
-             requires:
-               - build
 
 
 
