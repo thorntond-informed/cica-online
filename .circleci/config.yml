@@ -32,19 +32,20 @@ jobs:
           command: |
               docker build --no-cache -t cicav2-cica-online .
 
-      - run:
-          name: Authenticate with ECR registry
-          command: |
-             aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
-             chmod 777 dockerlogin.sh
-             ./dockerlogin.sh
-             rm dockerlogin.sh
+#      - run:
+#          name: Authenticate with ECR registry
+#          command: |
+#             aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
+#             chmod 777 dockerlogin.sh
+#             ./dockerlogin.sh
+#             rm dockerlogin.sh
 
       - run:
           name: Push docker container to ECR repository
           command: |
-              docker tag cicav2-cica-online:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo
-              docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo
+              aws ecr get-login --no-include-email --region ${AWS_REGION}
+              docker tag cicav2-cica-online:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
+              docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
 
 
 
