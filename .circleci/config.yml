@@ -31,6 +31,7 @@ jobs:
           name: Build docker image
           command: |
               docker build --no-cache -t cicav2-cica-online .
+              echo ${MY_ENV}
 
       - run:
           name: Authenticate with ECR registry
