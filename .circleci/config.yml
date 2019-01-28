@@ -22,10 +22,8 @@ jobs:
           command: |
              cp src/package.json /tmp/package.json
              cd /tmp && npm install
-             apt install pip -y
-             pip install \
-              docker-compose==1.12.0 \
-              awscli==1.11.76
+             apt-get update && apt-get install -y awscli
+             
              
 #             curl -O https://bootstrap.pypa.io/get-pip.py
 #             python get-pip.py --user
