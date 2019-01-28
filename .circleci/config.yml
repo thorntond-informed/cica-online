@@ -31,34 +31,33 @@ jobs:
 
 
 
-jobs:
-  package:
-     docker:
-       - image: circleci/node:8.11.3
+package:
+  docker:
+    - image: circleci/node:8.11.3
 
-     working_directory: /tmp
-     steps:
-       - checkout
-       - setup_remote_docker
-       - run:
-           name: Build docker image
-           command: |
-               cd ../
-               docker build --no-cache -t cicav2-cica-online .
+  working_directory: /tmp
+  steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Build docker image
+        command: |
+            cd ../
+            docker build --no-cache -t cicav2-cica-online .
 
-       - run:
-           name: Authenticate with ECR registry
-           command: |
-              aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh
-              chmod 777 dockerlogin.sh
-              ./dockerlogin.sh
-              rm dockerlogin.sh
+    - run:
+        name: Authenticate with ECR registry
+        command: |
+          aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh
+          chmod 777 dockerlogin.sh
+          ./dockerlogin.sh
+          rm dockerlogin.sh
 
-       - run:
-           name: Push docker container to ECR repository
-           command: |
-               docker tag cicav2-cica-online:latest 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-demo
-               docker push 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-dem
+    - run:
+        name: Push docker container to ECR repository
+        command: |
+            docker tag cicav2-cica-online:latest 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-demo
+            docker push 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-dem
 
 workflows:
   version: 2
