@@ -13,7 +13,7 @@ jobs:
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-    working_directory: /tmp
+    working_directory: ~/my-repo
 
     steps:
       - checkout
@@ -35,7 +35,7 @@ package:
   docker:
     - image: circleci/node:8.11.3
 
-  working_directory: ~
+  working_directory: ~/myrepo
   steps:
     - checkout
     - setup_remote_docker
