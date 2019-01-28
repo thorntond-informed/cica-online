@@ -22,7 +22,7 @@ jobs:
           command: |
              cp src/package.json /tmp/package.json
              cd /tmp && npm install
-             apt-get update && apt-get install -y awscli
+             sudo apt-get update && apt-get install -y awscli
              
              
 #             curl -O https://bootstrap.pypa.io/get-pip.py
