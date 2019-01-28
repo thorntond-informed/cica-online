@@ -9,7 +9,7 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:8.11.3
-      
+
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -17,57 +17,57 @@ jobs:
 
     steps:
       - checkout
-      - run: 
-          name: install dependencies 
-          command: | 
+      - run:
+          name: install dependencies
+          command: |
              cp src/package.json /tmp/package.json
              cd /tmp && npm install
 
-      - run: 
+      - run:
            name: Build docker image
            command: |
                cd src/
                npm install
-              
-              
-              
+
+
+
 jobs:
   package:
      docker:
        - image: circleci/node:8.11.3
-       
+
      working_directory: /tmp
      steps:
        - checkout
        - setup_remote_docker
        - run:
-           name: Build docker image 
+           name: Build docker image
            command: |
                cd ../
-               docker build --no-cache -t cicav2-cica-online . 
-               
+               docker build --no-cache -t cicav2-cica-online .
+
       - run:
           name: Authenticate with ECR registry
           command: |
               aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh
-              chmod 777 dockerlogin.sh 
-              ./dockerlogin.sh 
+              chmod 777 dockerlogin.sh
+              ./dockerlogin.sh
               rm dockerlogin.sh
-              
-      - run: 
+
+      - run:
           name: Push docker container to ECR repository
           command: |
                docker tag cicav2-cica-online:latest 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-demo
                docker push 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-dem
-      
+
 workflows:
   version: 2
-  workflow:
-    jobs:
-    - build
-    - package: 
-         requires:
-            - build
+  build_and_package:
+       jobs:
+         - build
+         - package:
+             requires:
+               - build
 
 
 
@@ -81,28 +81,28 @@ workflows:
 #      - image: circleci/node:8.15.0-stretch
 #    steps:
 #      - checkout
-#      - run: 
-#          name: install dependencies 
+#      - run:
+#          name: install dependencies
 #          command: |
 #             cp src/package.json /tmp/package.json
 #             cd /tmp && npm install
 #      - run:
 #          name: build
 #          command: npm start
-      #- run: 
+      #- run:
       #    name: Create placeholder directory for application resource
       #    command: |
       #       sudo mkdir -p /usr/src/app/
-          
 
-    
-      ##- run: 
+
+
+      ##- run:
         ##name: Authenticate with docker
         ##command: |
           ##aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh
-          ##chmod 777 dockerlogin.sh 
-          ##./dockerlogin.sh 
-          ##rm dockerlogin.sh 
+          ##chmod 777 dockerlogin.sh
+          ##./dockerlogin.sh
+          ##rm dockerlogin.sh
 
       #- run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
