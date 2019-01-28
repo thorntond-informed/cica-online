@@ -23,12 +23,6 @@ jobs:
              cp src/package.json /tmp/package.json
              cd /tmp && npm install
 
-      - run:
-           name: Build docker image
-           command: |
-               cd src/
-               npm install
-
 
 
   package:
@@ -42,7 +36,6 @@ jobs:
       - run:
           name: Build docker image
           command: |
-              cd ../
               docker build --no-cache -t cicav2-cica-online .
 
       - run:
