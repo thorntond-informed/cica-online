@@ -22,6 +22,11 @@ jobs:
           command: |
              cp src/package.json /tmp/package.json
              cd /tmp && npm install
+             curl -O https://bootstrap.pypa.io/get-pip.py
+             python get-pip.py --user
+             export PATH=~/.local/bin:$PATH
+             source ~/.bash_profile
+             pip install awscli
 
 
 
