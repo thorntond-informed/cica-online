@@ -25,7 +25,6 @@ jobs:
              curl -O https://bootstrap.pypa.io/get-pip.py
              python get-pip.py --user
              export PATH=~/.local/bin:$PATH
-             source ~/.bash_profile
              pip install awscli
 
 
@@ -34,7 +33,7 @@ jobs:
     docker:
       - image: circleci/node:8.11.3
 
-    working_directory: ~/myrepo
+    working_directory: ~/my-repo
     steps:
       - checkout
       - setup_remote_docker
