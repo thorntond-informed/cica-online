@@ -9,7 +9,7 @@ FROM node:8.11.3
 
 # Create placeholder directory for application source deposit
 RUN mkdir -p /usr/src/app
-RUN pip install awscli
+RUN apt-get install awscli
 
 # Bundle app source. 
 # Note that anything below this line will not use the Docker image cache
