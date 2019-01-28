@@ -35,7 +35,7 @@ package:
   docker:
     - image: circleci/node:8.11.3
 
-  working_directory: /tmp
+  working_directory: ~
   steps:
     - checkout
     - setup_remote_docker
