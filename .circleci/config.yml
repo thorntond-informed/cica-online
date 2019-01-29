@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-              docker build --no-cache -t $IMAGE_CONTAINER .
+              docker build -t $IMAGE_CONTAINER .
           
       - run:
           name: Test Image          
