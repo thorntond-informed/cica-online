@@ -35,7 +35,9 @@ jobs:
       - run:
           name: Test Image          
           command: |
+            docker run -d -p 8080:3000 $IMAGE_CONTAINER
             dgoss run -p 8080:3000 $IMAGE_CONTAINER
+            exit
             
       - run:
           name: Save image to an archive
