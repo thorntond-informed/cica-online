@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Test Image          
           command: |
-            docker run -d -p 8080:3000 --name built-image $IMAGE_CONTAINER
+            docker run -d -p 8080:3000 --name built-image $IMAGE_CONTAINER:latest
             sleep 20
             dgoss edit -p 8080:3000 built-image 
             goss a port 80
