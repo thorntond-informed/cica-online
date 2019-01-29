@@ -35,10 +35,7 @@ jobs:
       - run:
           name: Test Image          
           command: |
-            docker run -d -p 8080:3000 $IMAGE_CONTAINER
-            dgoss edit -p 8080:3000 $IMAGE_CONTAINER
-            goss a port 3000
-            exit
+            dgoss run -p 8080:3000 $IMAGE_CONTAINER
             
       - run:
           name: Save image to an archive
