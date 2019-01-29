@@ -13,7 +13,7 @@ jobs:
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-    working_directory: ~/my-repo
+    #working_directory: ~/my-repo
 
     steps:
       - checkout
@@ -37,8 +37,8 @@ jobs:
       - run:
           name: Test Image          
           command: |
-            docker run -d -p 8080:3000 --name built-image $IMAGE_CONTAINER:latest
-            sleep 20
+            docker run -d -p 8080:3000 --name built-image $IMAGE_CONTAINER
+            sleep 10
             dgoss edit -p 8080:3000 built-image 
             goss a port 80
             exit
