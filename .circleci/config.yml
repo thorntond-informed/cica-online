@@ -26,30 +26,68 @@ jobs:
              sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev
              curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py
              sudo pip install -q awscli --upgrade
+             curl -fsSL https://goss.rocks/install | sh
 
       - run:
           name: Build docker image
           command: |
-              docker build --no-cache -t cicav2-cica-online .
+              docker build --no-cache -t $FULL_IMAGE_NAME .name: Test image
+          
+      - run:
+          name: Test Image          
+          command: |
+            docker run -d -p 8080:3000 --name built-image $FULL_IMAGE_NAME
+            sleep 10
+            dgoss edit -p 8080:3000 built-image 
+            goss a port 80
+            exit
+            
+      - run:
+          name: Save image to an archive
+          command: |
+            mkdir docker-image
+            docker save -o docker-image/image.tar $FULL_IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - docker-image
+                    
+  push:
+    docker:
+      - image: circleci/node:8.11.3
+    environment:
+      AWS_DEFAULT_OUTPUT: json
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: workspace
 
-#      - run:
-#          name: Authenticate with ECR registry
-#          command: |
-#             aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
-#             chmod 777 dockerlogin.sh
-#             ./dockerlogin.sh
-#             rm dockerlogin.sh
-
+      - run:
+          name: Load image
+          command: |
+            docker load --input workspace/docker-image/image.tar
       - run:
           name: Push docker container to ECR repository
           command: |
-              aws ecr get-login --no-include-email --region ${AWS_REGION}
-              docker tag cicav2-cica-online:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
-              docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                 aws ecr get-login --no-include-email --region ${AWS_REGION}
+                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:$CIRCLE_SHA1
+              fi
 
 
 
-
+workflows:
+  version: 2
+  build-push:
+    jobs:
+      - build
+      - push:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
 
 
 
@@ -91,3 +129,16 @@ jobs:
 
       #- store_artifacts:
       #    path: Dockerfile
+      
+      
+      
+      
+      
+      
+#      - run:
+#          name: Authenticate with ECR registry
+#          command: |
+#             aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
+#             chmod 777 dockerlogin.sh
+#             ./dockerlogin.sh
+#             rm dockerlogin.sh
