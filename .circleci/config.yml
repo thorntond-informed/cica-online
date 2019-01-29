@@ -32,12 +32,12 @@ jobs:
       - run:
           name: Build docker image
           command: |
-              docker build -t ${FULL_IMAGE_NAME} .
+              docker build --no-cache -t $IMAGE_CONTAINER .
           
       - run:
           name: Test Image          
           command: |
-            docker run -d -p 8080:3000 --name built-image $FULL_IMAGE_NAME
+            docker run -d -p 8080:3000 --name built-image $IMAGE_CONTAINER
             sleep 10
             dgoss edit -p 8080:3000 built-image 
             goss a port 80
@@ -47,7 +47,7 @@ jobs:
           name: Save image to an archive
           command: |
             mkdir docker-image
-            docker save -o docker-image/image.tar $FULL_IMAGE_NAME
+            docker save -o docker-image/image.tar $IMAGE_CONTAINER
       - persist_to_workspace:
           root: .
           paths:
