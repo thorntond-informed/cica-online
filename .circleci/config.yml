@@ -35,9 +35,8 @@ jobs:
       - run:
           name: Test Image          
           command: |
-            docker run -d -p 8080:3000 $IMAGE_CONTAINER
-            dgoss edit -p 8080:3000 $IMAGE_CONTAINER
-            goss a port 3000
+            dgoss edit -p 8090:3030 $IMAGE_CONTAINER
+            goss a port 3030
             exit
             
       - run:
