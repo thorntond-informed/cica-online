@@ -32,7 +32,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-              docker build -t $FULL_IMAGE_NAME .
+              docker build -t ${FULL_IMAGE_NAME} .
           
       - run:
           name: Test Image          
