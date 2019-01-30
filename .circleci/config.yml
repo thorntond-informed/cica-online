@@ -35,9 +35,7 @@ jobs:
       - run:
           name: Test Image          
           command: |
-            dgoss edit -p 8090:3030 $IMAGE_CONTAINER
-            goss a port 3030
-            exit
+            dgoss run -p 8090:3030 $IMAGE_CONTAINER
             
       - run:
           name: Save image to an archive
