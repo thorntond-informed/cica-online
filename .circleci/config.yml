@@ -31,11 +31,6 @@ jobs:
           name: Build docker image
           command: |
               docker build -t $IMAGE_CONTAINER .
-          
-      - run:
-          name: Test Image          
-          command: |
-            dgoss run -p 8090:3030 $IMAGE_CONTAINER
             
       - run:
           name: Save image to an archive
@@ -55,6 +50,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - docker_layer_caching: true
       - attach_workspace:
           at: workspace
 
@@ -62,6 +58,15 @@ jobs:
           name: Load image
           command: |
             docker load --input workspace/docker-image/image.tar
+            
+      - run:
+          name: Authenticate with ECR registry
+          command: |
+             aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
+             chmod 777 dockerlogin.sh
+             ./dockerlogin.sh
+             rm dockerlogin.sh
+
       - run:
           name: Push docker container to ECR repository
           command: |
