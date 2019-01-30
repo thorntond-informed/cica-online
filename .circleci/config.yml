@@ -31,7 +31,7 @@ jobs:
           name: Build docker image
           command: |
               docker build -t $IMAGE_CONTAINER .
-            
+
       - run:
           name: Save image to an archive
           command: |
@@ -41,7 +41,7 @@ jobs:
           root: .
           paths:
             - docker-image
-                    
+
   push:
     docker:
       - image: circleci/node:8.11.3
@@ -59,7 +59,7 @@ jobs:
              sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev
              curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py
              sudo pip install -q awscli --upgrade
-            
+
       - run:
           name: Authenticate with ECR registry
           command: |
@@ -72,7 +72,7 @@ jobs:
           name: Load image
           command: |
             docker load --input workspace/docker-image/image.tar
-            docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:$CIRCLE_SHA1            
+            docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:$CIRCLE_SHA1
       - run:
           name: Push docker container to ECR repository
           command: |
@@ -80,6 +80,20 @@ jobs:
                  docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:$CIRCLE_SHA1
               fi
 
+  deploy: 
+    docker:
+      - image: circleci/node:8.11.3
+    environment:
+      AWS_DEFAULT_OUTPUT: json
+    steps:
+      - checkout
+      - setup_remote_docker
+
+
+      - run:
+          name: install kubectl
+          command: |
+              sudo snap install kubectl --classic
 
 
 workflows:
@@ -134,12 +148,12 @@ workflows:
 
       #- store_artifacts:
       #    path: Dockerfile
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
 #      - run:
 #          name: Authenticate with ECR registry
 #          command: |
