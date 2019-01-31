@@ -72,17 +72,17 @@ jobs:
           name: Load image
           command: |
             docker load --input workspace/docker-image/image.tar
-            docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:$CIRCLE_SHA1
+            docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
       - run:
           name: Push docker container to ECR repository
           command: |
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:$CIRCLE_SHA1
+                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
               fi
 
-  deploy: 
+  deploy:
     docker:
-      - image: circleci/node:8.11.3
+      - image: docker:18.05.0-ce-git
     environment:
       AWS_DEFAULT_OUTPUT: json
     steps:
@@ -91,9 +91,11 @@ jobs:
 
 
       - run:
-          name: install kubectl
+          name: Deploy to the cluster
           command: |
-              sudo snap install kubectl --classic
+              cd kube_deploy
+              kubectl get pods --namespace cica-development
+
 
 
 workflows:
@@ -106,7 +108,7 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: develop
 
 
 
