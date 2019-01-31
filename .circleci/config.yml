@@ -72,12 +72,12 @@ jobs:
           name: Load image
           command: |
             docker load --input workspace/docker-image/image.tar
-            docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
+            docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo3
       - run:
           name: Push docker container to ECR repository
           command: |
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
+                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo3
               fi
 
   deploy:
@@ -88,6 +88,11 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      
+      - run: 
+          name: Install kubectl
+          command: |
+              sudo snap install kubectl --classic
 
 
       - run:
