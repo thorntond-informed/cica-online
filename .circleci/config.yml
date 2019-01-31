@@ -92,8 +92,7 @@ jobs:
       - run: 
           name: Install kubectl
           command: |
-              sudo snap install kubectl --classic
-
+              curl -sLo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
 
       - run:
           name: Deploy to the cluster
@@ -108,18 +107,28 @@ workflows:
   build-push-deploy:
     jobs:
       - build
-      - push:
-          requires:
-            - build
-          filters:
-            branches:
-              only: develop
       - deploy:
           requires:
-             - push
+             - build
           filters:
              branches:
-                only: develop
+                only: develop      
+      
+      
+      
+      
+#      - push:
+#          requires:
+#            - build
+#          filters:
+#            branches:
+#              only: develop
+#      - deploy:
+#          requires:
+#             - push
+#          filters:
+#             branches:
+#                only: develop
 
 
 
