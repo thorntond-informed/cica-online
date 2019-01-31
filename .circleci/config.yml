@@ -82,21 +82,15 @@ jobs:
 
   deploy:
     docker:
-      - image: docker:18.05.0-ce-git
+      - image: circleci/docker:18.05.0-ce-git
     environment:
       AWS_DEFAULT_OUTPUT: json
     steps:
       - checkout
-      - setup_remote_docker
-      
-      - run: 
-          name: Install kubectl
-          command: |
-              curl -sLo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
-
       - run:
           name: Deploy to the cluster
           command: |
+              setup-kube-auth
               cd kube_deploy
               kubectl get pods --namespace cica-development
 
@@ -132,54 +126,6 @@ workflows:
 
 
 
-#version: 2
-#jobs:
-#  build:
-#    docker:
-#      - image: circleci/node:8.15.0-stretch
-#    steps:
-#      - checkout
-#      - run:
-#          name: install dependencies
-#          command: |
-#             cp src/package.json /tmp/package.json
-#             cd /tmp && npm install
-#      - run:
-#          name: build
-#          command: npm start
-      #- run:
-      #    name: Create placeholder directory for application resource
-      #    command: |
-      #       sudo mkdir -p /usr/src/app/
 
 
 
-      ##- run:
-        ##name: Authenticate with docker
-        ##command: |
-          ##aws ecr get-login --no-include-email --region eu-west-1 > dockerlogin.sh
-          ##chmod 777 dockerlogin.sh
-          ##./dockerlogin.sh
-          ##rm dockerlogin.sh
-
-      #- run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-
-      #- run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
-
-      #- run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
-
-      #- store_artifacts:
-      #    path: Dockerfile
-
-
-
-
-
-
-#      - run:
-#          name: Authenticate with ECR registry
-#          command: |
-#             aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
-#             chmod 777 dockerlogin.sh
-#             ./dockerlogin.sh
-#             rm dockerlogin.sh
