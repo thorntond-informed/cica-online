@@ -90,7 +90,6 @@ jobs:
       - run:
           name: Deploy to the cluster
           command: |
-#              $(aws ecr get-login --region eu-west-1 --no-include-email)
               aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
               chmod 777 dockerlogin.sh
               ./dockerlogin.sh
@@ -122,6 +121,7 @@ workflows:
 #             branches:
 #                only: develop
 
+#              $(aws ecr get-login --region eu-west-1 --no-include-email)
 
 
 
