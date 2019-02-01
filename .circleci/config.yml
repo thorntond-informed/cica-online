@@ -90,8 +90,9 @@ jobs:
       - run:
           name: Deploy to the cluster
           command: |
+              $(aws ecr get-login --region eu-west-1 --no-include-email)
               setup-kube-auth
-              cd kube_deploy
+              kubectl config use-context cloud-platform-live-0.k8s.integration.dsd.io
               kubectl get pods --namespace cica-development
 
 
