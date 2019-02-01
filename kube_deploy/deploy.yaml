@@ -14,16 +14,16 @@ spec:
     spec:
       containers:
       - name: cica-online-staging
-        image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-demo2
+        image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-demo3
         ports:
         - containerPort: 4010
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 4010
-          initialDelaySeconds: 15
-          timeoutSeconds: 1
-          periodSeconds: 10
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: 4010
+#          initialDelaySeconds: 15
+#          timeoutSeconds: 1
+#          periodSeconds: 10
 
 
 ---
