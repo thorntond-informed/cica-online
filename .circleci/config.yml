@@ -90,12 +90,8 @@ jobs:
       - setup_remote_docker
       - run:
           name: Deploy to the cluster
-          command: |
-              
-              aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
-              chmod 777 dockerlogin.sh
-              ./dockerlogin.sh
-              rm dockerlogin.sh
+          command: |       
+              $(aws ecr get-login --region eu-west-1 --no-include-email)
               setup-kube-auth
               kubectl config use-context development
               kubectl get pods --namespace cica-development
