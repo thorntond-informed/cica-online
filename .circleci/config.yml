@@ -97,7 +97,7 @@ jobs:
               ./dockerlogin.sh
               rm dockerlogin.sh
               setup-kube-auth
-              kubectl config use-context uat
+              kubectl config use-context development
               kubectl get pods --namespace cica-development
 
 
