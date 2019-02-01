@@ -95,7 +95,7 @@ jobs:
               ./dockerlogin.sh
               rm dockerlogin.sh
               setup-kube-auth
-              kubectl config use-context cloud-platform-live-0.k8s.integration.dsd.io
+              kubectl config use-context cloud-platform-live-0.k8s.integration.dsd.io --namespace cica-development
               kubectl get pods --namespace cica-development
 
 
