@@ -49,7 +49,7 @@ metadata:
   name: cica-online-staging-ingress
 spec:
   rules:
-  - host: cica-online-staging.apps.cloud-platform-live-0.k8s.integration.dsd.io
+  - host: cica-online-circleci-deploy.apps.cloud-platform-live-0.k8s.integration.dsd.io
     http:
       paths:
       - path: /
