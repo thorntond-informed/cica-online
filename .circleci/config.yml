@@ -7,80 +7,25 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      - image: circleci/node:8.11.3
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-    #working_directory: ~/my-repo
-
+      # Image tool container
+      - image: ${ECR_REPOSITORY}/${ECR_REPO_NAME}:image-tools-circleci
     steps:
       - checkout
       - setup_remote_docker
-#      - run:
-#          name: install dependencies
-#          command: |
-#             sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev
-#             curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py
-#             sudo pip install -q awscli --upgrade
-#             sudo chown -R $(whoami):$(whoami) /usr/local
-#             curl -fsSL https://goss.rocks/install | sh
-
       - run:
           name: Build docker image
           command: |
               docker build -t $IMAGE_CONTAINER .
-
       - run:
-          name: Save image to an archive
+          name: Authenticate and push image to ecr
           command: |
-            mkdir docker-image
-            docker save -o docker-image/image.tar $IMAGE_CONTAINER
-      - persist_to_workspace:
-          root: .
-          paths:
-            - docker-image
-
-  push:
-    docker:
-      - image: circleci/node:8.11.3
-    environment:
-      AWS_DEFAULT_OUTPUT: json
-    steps:
-      - checkout
-      - setup_remote_docker
-      - attach_workspace:
-          at: workspace
-
-      - run:
-          name: install dependencies
-          command: |
-             sudo apt-get update && sudo apt-get install -qq -y python-pip libpython-dev
-             curl -O https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py
-             sudo pip install -q awscli --upgrade
-
-      - run:
-          name: Authenticate with ECR registry
-          command: |
-             aws ecr get-login --no-include-email --region ${AWS_REGION} > dockerlogin.sh
-             chmod 777 dockerlogin.sh
-             ./dockerlogin.sh
-             rm dockerlogin.sh
-
-      - run:
-          name: Load image
-          command: |
-            docker load --input workspace/docker-image/image.tar
-            docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo3
-      - run:
-          name: Push docker container to ECR repository
-          command: |
+              $(aws ecr get-login --region eu-west-1 --no-include-email)
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo3
+                 docker tag $IMAGE_CONTAINER ${ECR_REPOSITORY}/${ECR_REPO_NAME}:${CIRCLE_SHA1}
+                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:${CIRCLE_SHA1}
               fi
-
-  deploy:
+    
+  deploy_to_dev:
     docker:
       - image: ${ECR_REPOSITORY}/${ECR_REPO_NAME}:image-tools-circleci
     environment:
@@ -102,7 +47,8 @@ workflows:
   version: 2
   build-push-deploy:
     jobs:
-      - deploy
+      - build
+      - deploy_to_dev
       
       
       
@@ -119,7 +65,6 @@ workflows:
 #             branches:
 #                only: develop
 
-#              $(aws ecr get-login --region eu-west-1 --no-include-email)
 
 
 
