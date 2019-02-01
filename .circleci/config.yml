@@ -21,10 +21,10 @@ jobs:
           command: |
               $(aws ecr get-login --region eu-west-1 --no-include-email)
               if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-                 docker tag $IMAGE_CONTAINER ${ECR_REPOSITORY}/${ECR_REPO_NAME}:${CIRCLE_SHA1}
-                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:${CIRCLE_SHA1}
+                 docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
+                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-demo2
               fi
-    
+
   deploy_to_dev:
     docker:
       - image: ${ECR_REPOSITORY}/${ECR_REPO_NAME}:image-tools-circleci
@@ -35,11 +35,11 @@ jobs:
       - setup_remote_docker
       - run:
           name: Deploy to the cluster
-          command: |       
+          command: |
               $(aws ecr get-login --region eu-west-1 --no-include-email)
               setup-kube-auth
               kubectl config use-context development
-              kubectl get pods --namespace cica-development
+              ./deploy_to_dev.sh
 
 
 
@@ -48,10 +48,17 @@ workflows:
   build-push-deploy:
     jobs:
       - build
-      - deploy_to_dev
-      
-      
-      
+      - deploy_to_dev:
+          requires:
+             - build
+          filters:
+            branches:
+              only: develop
+
+
+
+
+
 #      - push:
 #          requires:
 #            - build
@@ -64,9 +71,3 @@ workflows:
 #          filters:
 #             branches:
 #                only: develop
-
-
-
-
-
-
