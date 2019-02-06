@@ -21,8 +21,8 @@ jobs:
           command: |
               $(aws ecr get-login --region eu-west-1 --no-include-email)
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                 docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-deploy-demo
-                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-deploy-demo
+                 docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-online-dev
+                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-online-dev
               fi
 
   deploy_to_dev:
@@ -49,6 +49,7 @@ workflows:
     jobs:
       - build
       - deploy_to_dev:
+          type: approval
           requires:
              - build
           filters:
