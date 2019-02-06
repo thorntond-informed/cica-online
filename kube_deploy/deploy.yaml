@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: cica-online-staging
-        image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-online1
+        image: 926803513772.dkr.ecr.eu-west-1.amazonaws.com/cica/cicadevelopment:circleci-online-dev
         ports:
         - containerPort: 3000
 #        livenessProbe:
