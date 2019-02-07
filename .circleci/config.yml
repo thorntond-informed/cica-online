@@ -50,12 +50,12 @@ workflows:
     jobs:
       - build
       - deploy_to_dev:
-          type: approval
-          requires:
+           type: approval
+           requires:
              - build
-          filters:
-            branches:
-              only: develop
+           filters:
+             branches:
+               only: develop
 
 
 
