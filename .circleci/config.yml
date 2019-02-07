@@ -48,8 +48,8 @@ workflows:
   build-push-deploy:
     jobs:
       - build
+          type: approval
       - deploy_to_dev:
-           type: approval
            filters:
              branches:
                only: develop
