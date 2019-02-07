@@ -48,7 +48,6 @@ workflows:
   build-push-deploy:
     jobs:
       - build
-          type: approval
       - deploy_to_dev:
            filters:
              branches:
