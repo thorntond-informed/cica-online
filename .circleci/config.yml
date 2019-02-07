@@ -47,9 +47,9 @@ workflows:
   version: 2
   build-push-deploy:
     jobs:
-      - build
-        filters:
-          branches:
+      - build:
+          filters:
+            branches:
              only: develop
       - deploy_to_dev:
            requires:
