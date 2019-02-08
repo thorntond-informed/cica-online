@@ -1,4 +1,3 @@
-
 # Javascript Node CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
@@ -18,7 +17,7 @@ jobs:
               docker build -t $IMAGE_CONTAINER .
       - run:
           name: Install dgoss for testing
-             command: |
+          command: |
                  curl -fsSL https://goss.rocks/install | sh
       - run:
           name: Test the container
