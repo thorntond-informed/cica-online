@@ -59,9 +59,6 @@ workflows:
            type: approval
            reguires:
               - build
-           filters:
-            branches:
-             only: develop
       - deploy_to_dev:
            requires:
              - hold_dev
