@@ -17,5 +17,5 @@ WORKDIR /usr/src/app
 COPY src/ /usr/src/app
 RUN cp -a /tmp/node_modules /usr/src/app
 
-EXPOSE 4000
+EXPOSE 3000
 CMD [ "npm", "start" ]
