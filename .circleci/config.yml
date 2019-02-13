@@ -2,27 +2,51 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
-jobs:
-  build:
+version: 2.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_NAME: $IMAGE_CONTAINER
     docker:
       # Image tool container
       - image: ${ECR_REPOSITORY}/${ECR_REPO_NAME}:image-tools-circleci
+jobs:
+  build:
+    executor: docker-publisher
     steps:
       - checkout
       - setup_remote_docker
       - run:
           name: Build docker image
           command: |
-              docker build -t $IMAGE_CONTAINER .
+              docker build --no-cache -t $IMAGE_CONTAINER .
       - run:
-          name: Install dgoss for testing
+          name: Archive Docker Image
           command: |
-                 curl -fsSL https://goss.rocks/install | sh
+              docker save -o image.tar $IMAGE_CONTAINER
+      - persist_to_workstation:
+           root: .
+           paths:
+             - ./image.tar
+  publish_latest:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -l /tmp/workspace/image.tar
+      - run:
+          name: Install test tools
+          command: curl -fsSL https://goss.rocks/install | sh
       - run:
           name: Test the container
           command: |
               dgoss run -d -p 8080:3000 $IMAGE_CONTAINER
+  push_image:
+    executor: docker-publisher
+    steps:
       - run:
           name: Authenticate and push image to ecr
           command: |
@@ -33,12 +57,8 @@ jobs:
               fi
 
   deploy_to_dev:
-    docker:
-      - image: ${ECR_REPOSITORY}/${ECR_REPO_NAME}:image-tools-circleci
-    environment:
-      AWS_DEFAULT_OUTPUT: json
+    executor: docker-publisher
     steps:
-      - checkout
       - setup_remote_docker
       - run:
           name: Deploy to the cluster
@@ -52,16 +72,22 @@ jobs:
 
 workflows:
   version: 2
-  build-push-deploy:
+  build-test-push-deploy:
     jobs:
       - build
-      - hold_dev:
-           type: approval
-           reguires:
-              - build
-      - deploy_to_dev:
+      - publish-latest:
            requires:
-             - hold_dev
+             - build
+      - push-image:
+           requires:
+             - publish-latest
+           filters:
+             branches:
+               only: master
+      - deploy_to_dev:
+           type: approval
+           requires:
+             - push-image
            filters:
              branches:
                only: master
