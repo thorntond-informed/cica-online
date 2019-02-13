@@ -36,7 +36,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Load archived Docker image
-          command: docker load -l /tmp/workspace/image.tar
+          command: docker load -i /tmp/workspace/image.tar
       - run:
           name: Install test tools
           command: curl -fsSL https://goss.rocks/install | sh
