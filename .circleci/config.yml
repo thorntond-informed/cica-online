@@ -75,19 +75,19 @@ workflows:
   build-test-push-deploy:
     jobs:
       - build
-      - publish-latest:
+      - publish_latest:
            requires:
              - build
-      - push-image:
+      - push_image:
            requires:
-             - publish-latest
+             - publish_latest
            filters:
              branches:
                only: master
       - deploy_to_dev:
            type: approval
            requires:
-             - push-image
+             - push_image
            filters:
              branches:
                only: master
