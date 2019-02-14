@@ -37,13 +37,15 @@ jobs:
       - run:
           name: Load archived Docker image
           command: docker load -i /tmp/workspace/image.tar
-      - run:
-          name: Install test tools
-          command: curl -fsSL https://goss.rocks/install | sh
+#      - run:
+#          name: Install test tools
+#          command: curl -fsSL https://goss.rocks/install | sh
       - run:
           name: Test the container
           command: |
-              dgoss run -d -p 8080:3000 $IMAGE_CONTAINER
+              docker run -d -p 5000:3000 -p 5858:5858 --restart=always --name cica-online-test $IMAGE_CONTAINER
+              docker logs --since 0m -f $IMAGE_CONTAINER
+              docker stop cica-online-test 
   push_image:
     executor: docker-publisher
     steps:
