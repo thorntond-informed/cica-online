@@ -50,6 +50,7 @@ jobs:
   push_image:
     executor: docker-publisher
     steps:
+      - setup_remote_docker
       - run:
           name: Authenticate and push image to ecr
           command: |
