@@ -44,7 +44,7 @@ jobs:
           name: Test the container
           command: |
               docker run -d -p 5000:3000 -p 5858:5858 --restart=always --name cica-online-test $IMAGE_CONTAINER:latest
-              docker ps        
+              docker ps
               docker stop cica-online-test
               docker ps
   push_image:
@@ -55,9 +55,9 @@ jobs:
           name: Authenticate and push image to ecr
           command: |
               $(aws ecr get-login --region eu-west-1 --no-include-email)
-              if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                 docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-online-dev
-                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-online-dev
+              if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+                 docker tag $IMAGE_CONTAINER:latest ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-online-dev2
+                 docker push ${ECR_REPOSITORY}/${ECR_REPO_NAME}:circleci-online-dev2
               fi
 
   deploy_to_dev:
@@ -70,10 +70,10 @@ jobs:
               $(aws ecr get-login --region eu-west-1 --no-include-email)
               setup-kube-auth
               kubectl config use-context development
-              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              if [ "${CIRCLE_BRANCH}" == "develop" ]; then
                  ./deploy_dev.sh
-              else 
-                 echo "You cannot deploy ${CIRCLE_BRANCH} branche.. Only master brache can be deployed!"
+              else
+                 echo "You cannot deploy ${CIRCLE_BRANCH} branche.. Only develop brache can be deployed!"
               fi
 
 
