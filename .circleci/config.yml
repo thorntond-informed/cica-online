@@ -44,9 +44,9 @@ jobs:
           name: Test the container
           command: |
               docker run -d -p 5000:3000 -p 5858:5858 --restart=always --name cica-online-test $IMAGE_CONTAINER:latest
-              docker exec -it cica-online-test bash
-              ls -al
-              docker stop cica-online-test 
+              docker ps        
+              docker stop cica-online-test
+              docker ps
   push_image:
     executor: docker-publisher
     steps:
