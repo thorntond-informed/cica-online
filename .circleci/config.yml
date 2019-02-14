@@ -69,7 +69,11 @@ jobs:
               $(aws ecr get-login --region eu-west-1 --no-include-email)
               setup-kube-auth
               kubectl config use-context development
-              ./deploy_dev.sh
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                 ./deploy_dev.sh
+              else 
+                 echo "You cannot deploy ${CIRCLE_BRANCH} branche.. Only master brache can be deployed!"
+              fi
 
 
 
@@ -86,14 +90,14 @@ workflows:
              - publish_latest
            filters:
              branches:
-               only: master
+               only: develop
       - deploy_to_dev:
            type: approval
            requires:
              - push_image
            filters:
              branches:
-               only: master
+               only: develop
 
 
 
